@@ -1,0 +1,1 @@
+include ':app', ':compiler', ':module_a', ':module_b', ':module_base', ':annotations'
