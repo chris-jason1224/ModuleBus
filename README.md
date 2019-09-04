@@ -19,4 +19,26 @@
     f、每个动态生成的接口都下沉在base——module中，其他业务组件需要依赖于base-module
 
 
-2、感谢美团技术团队开源的文章，以及@Jeremy Liao 大佬的指导
+
+2.useAge
+
+            initialize(In BaseApplication):
+            ModuleBus.getInstance().init(this);
+
+            注册接收器：
+            ModuleBus.getInstance().of(Gen$module_a$Interface.class).Gen$event_1$Method().observe(this, new Observer<String>() {
+            @Override
+            public void onChanged(String s) {
+                Toast.makeText(ActA.this, s, Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+       
+           发送消息： 
+           ModuleBus.getInstance().of(Gen$module_b$Interface.class).Gen$eee$Method().post("moduleA send msg to moduleB");
+            
+
+
+
+3.感谢美团技术团队开源的文章，以及@Jeremy Liao 大佬的指导
