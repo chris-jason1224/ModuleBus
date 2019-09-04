@@ -21,7 +21,7 @@ public class ActB extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_act_b);
-        ModuleBus.getInstance().of(Gen$module_b$Interface.class).Gen$eee$Method().observe(this, new Observer<String>() {
+        ModuleBus.getInstance().of(Gen$module_b$Interface.class).Gen$eee$Method().observeSticky(this, new Observer<String>() {
             @Override
             public void onChanged(String s) {
                 Toast.makeText(ActB.this, s, Toast.LENGTH_SHORT).show();
@@ -30,8 +30,8 @@ public class ActB extends AppCompatActivity {
         findViewById(R.id.toa).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ARouter.getInstance().build("/module_a/act/a").navigation();
                 ModuleBus.getInstance().of(Gen$module_a$Interface.class).Gen$event_1$Method().post("moduleB send msg to moduleA");
+                ARouter.getInstance().build("/module_a/act/a").navigation();
             }
         });
     }

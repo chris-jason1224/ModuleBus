@@ -32,8 +32,8 @@ public class ActA extends AppCompatActivity {
         findViewById(R.id.tob).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ARouter.getInstance().build("/module_b/act/b").navigation();
                 ModuleBus.getInstance().of(Gen$module_b$Interface.class).Gen$eee$Method().post("moduleA send msg to moduleB");
+                ARouter.getInstance().build("/module_b/act/b").navigation();
             }
         });
     }
