@@ -16,7 +16,7 @@
     
     e、运行时采用interface+动态代理的方式实现真正的消息订阅和发送。
     
-    f、每个动态生成的接口都下沉在base——module中，其他业务组件需要依赖于base-module
+    f、每个动态生成的接口都下沉在base_module中，其他业务组件需要依赖于base_module
 
 
 
@@ -41,4 +41,4 @@
 
 
 
-3.感谢美团技术团队开源的文章，以及@Jeremy Liao 大佬的指导
+3.感谢美团技术团队开源的文章，以及 [@Jeremy Liao](URL 'https://github.com/JeremyLiao')大佬的指导
