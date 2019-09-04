@@ -1,4 +1,4 @@
-# ModuleBus
+# ModuleBus 支持跨模块收发消息
 
 
 1.实现思路：
