@@ -1,8 +1,10 @@
 # ModuleBus
 
 
-1.参考美团实现思路 @link https://tech.meituan.com/2018/12/20/modular-event.html
-
+1.实现思路：
+          参考美团技术团队发布的文章 @link https://tech.meituan.com/2018/12/20/modular-event.html
+          消息收发使用LiveEventBus 完成 @link https://github.com/JeremyLiao/LiveEventBus
+      
   
     a、通过@ModuleEventCenter注解，定义消息的清单文件
     
@@ -15,3 +17,6 @@
     e、运行时采用interface+动态代理的方式实现真正的消息订阅和发送。
     
     f、每个动态生成的接口都下沉在base——module中，其他业务组件需要依赖于base-module
+
+
+2、感谢美团技术团队开源的文章，以及@Jeremy Liao 大佬的指导
