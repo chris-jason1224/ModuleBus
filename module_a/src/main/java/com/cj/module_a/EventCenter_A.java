@@ -11,10 +11,10 @@ import com.cj.annotations.bus.ModuleEventCenter;
 @ModuleEventCenter
 public class EventCenter_A{
 
-    @EventRegister(type = String.class)
+    @EventRegister(classType = String.class)
     private String event_1 = "event_11111";
 
-    @EventRegister(type = Integer.class)
+    @EventRegister(classType = Integer.class)
     private String event_2 = "event_2222222gygtf";
 
 

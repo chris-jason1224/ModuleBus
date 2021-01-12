@@ -12,7 +12,9 @@ import com.cj.annotations.bus.ModuleEventCenter;
 @ModuleEventCenter
 public class EventCenter_B {
 
-    @EventRegister(type = String.class)
+    @EventRegister(classType = String.class)
     public String eee = "fefef";
 
+    @EventRegister(classType = Boolean.class,asList = true)
+    public String testList = "test";
 }

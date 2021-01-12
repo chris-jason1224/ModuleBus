@@ -2,9 +2,9 @@ apply plugin: 'java-library'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation "com.google.code.gson:gson:${rootProject.gsonVersion}"
-    implementation project(':annotations')
-    implementation "com.squareup:javapoet:${rootProject.ext.javaPoetVersion}"
+    api "com.google.code.gson:gson:${rootProject.gsonVersion}"
+    api project(':annotations')
+    api "com.squareup:javapoet:${rootProject.ext.javaPoetVersion}"
 }
 
 sourceCompatibility = rootProject.ext.javaVersion

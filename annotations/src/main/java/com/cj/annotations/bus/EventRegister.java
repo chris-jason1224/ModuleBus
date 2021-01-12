@@ -14,5 +14,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.SOURCE)
 public @interface EventRegister {
-    Class<?> type() default Object.class;
+    Class<?> classType() default Object.class;
+    boolean asList() default false;
 }

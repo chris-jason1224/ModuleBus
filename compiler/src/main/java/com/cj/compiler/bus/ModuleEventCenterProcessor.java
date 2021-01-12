@@ -13,9 +13,11 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import org.xml.sax.SAXException;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -26,6 +28,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import javax.annotation.processing.AbstractProcessor;
 import javax.annotation.processing.Messager;
 import javax.annotation.processing.ProcessingEnvironment;
@@ -78,7 +81,6 @@ public class ModuleEventCenterProcessor extends AbstractProcessor {
     public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 
         String moduleName = options.get(Key.OPTION_MODULE_NAME);
-        //String filePath = moduleName + "/src/main/assets/" + Key.MODULE_EVENT_FILE_PRE + moduleName + ".json";
         Set elements = roundEnv.getElementsAnnotatedWith(ModuleEventCenter.class);
 
         if (elements.size() > 1) {
@@ -147,29 +149,35 @@ public class ModuleEventCenterProcessor extends AbstractProcessor {
                             String annotationType = mirror.getAnnotationType().toString();
                             if (annotationType != null && annotationType.equals(EventRegister.class.getCanonicalName())) {
                                 //key被定义成方法 EventRegisterEntity.type()
+                                String className = "";
+                                boolean asList = false;
+
                                 for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry : mirror.getElementValues().entrySet()) {
-                                    if (entry.getKey().getSimpleName().toString().equals("type")) {
-                                        try {
-                                            AnnotationValue value = entry.getValue();
-                                            String className = value.getValue().toString();
-                                            EventRegisterEntity method = new EventRegisterEntity(fieldName.toString(), className);
-                                            methodList.add(method);
-                                        } catch (Exception e) {
-                                            e.printStackTrace();
-                                        }
+                                    AnnotationValue value = entry.getValue();
+                                    String key = entry.getKey().getSimpleName().toString();
+                                    if (key.equals("classType")) {
+                                        className = value.getValue().toString();
                                     }
+
+                                    if (key.equals("asList")) {
+                                        asList = Boolean.parseBoolean(entry.getValue().getValue().toString());
+                                    }
+
                                 }
+                                EventRegisterEntity method = new EventRegisterEntity(fieldName.toString(), className, asList);
+                                methodList.add(method);
+
                             }
                         }
                     }
                 }
             }
 
-            //todo javaPoet生成对应的接口
+            //javaPoet生成对应的接口
             //接口名：Gen& + moduleName + $Interface
             //方法名：Gen& +fieldName + $Method ,无参数,返回类型 com.cj.module_base.bus.Observable<className>
             if (methodList.size() == 0) {
-                LogUtil.getInstance(messager).e_Message("暂无组件消息注册");
+                LogUtil.getInstance(messager).e_Message(moduleName + "暂无组件消息注册");
                 return false;
             }
 
@@ -180,24 +188,35 @@ public class ModuleEventCenterProcessor extends AbstractProcessor {
                     String[] names = eventRegisterEntity.getClassName().split("\\.");
                     StringBuffer buffer = new StringBuffer();
                     for (int i = 0; i < names.length; i++) {
-                        if (i < names.length-1) {
+                        if (i < names.length - 1) {
                             buffer.append(".");
                             buffer.append(names[i]);
                         }
                     }
-                    //@EventRegister可能会添加一些系统类，无法直接通过反射回去Type
+                    //@EventRegister可能会添加一些系统类，无法直接通过反射获取Type
                     String packageName = buffer.toString().replaceFirst(".", "");
                     String simpleName = names[names.length - 1];
+
+                    //泛型类型type
+                    TypeName type = ClassName.get(packageName, simpleName);
+
+                    //返回值类型：Observable<type>
+                    ParameterizedTypeName observable = null;
+
+                    //返回值类型：Observable<List<type>>、Observable<type>
+                    if (eventRegisterEntity.isAsList()) {
+                        TypeName listType = ParameterizedTypeName.get(ClassName.get("java.util", "List"), type);
+                        observable = ParameterizedTypeName.get(ClassName.get("com.cj.module_base.bus", "Observable"), listType);
+                    } else {
+                        observable = ParameterizedTypeName.get(ClassName.get("com.cj.module_base.bus", "Observable"), type);
+                    }
 
                     MethodSpec methodSpec = MethodSpec.
                             methodBuilder("Gen$" + eventRegisterEntity.getFieldName() + "$Method")
                             .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                             .addJavadoc("获取消息\n") // 添加注释
-                            .returns(ParameterizedTypeName.get(ClassName.get("com.cj.module_base.bus", "Observable"), ClassName.get(packageName, simpleName)))
+                            .returns(observable)
                             .build();
-
-
-                    ClassName.get("android.content", "intent");
 
                     methodSpecs.add(methodSpec);
                 } catch (Exception e) {
@@ -217,8 +236,13 @@ public class ModuleEventCenterProcessor extends AbstractProcessor {
                     .addFileComment("Auto generated code , Do not edit")
                     .build();
             try {
+                //获取当前工程所在路径
+                String projectPath = System.getProperty("user.dir");
                 //生成代码路径
-                javaFile.writeTo(new File("module_base/src/main/java/"));
+                //File dir = new File(projectPath+"/module_base/src/main/java/");
+                File dir = new File(projectPath+"/module_base/build/generated/source/apt/debug/");
+                javaFile.writeTo(dir);
+                //javaFile.writeTo(processingEnv.getFiler());
             } catch (IOException e) {
                 e.printStackTrace();
             }
